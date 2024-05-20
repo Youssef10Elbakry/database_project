@@ -44,42 +44,46 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  buttomNavBar()=> BottomNavigationBar(
-    backgroundColor: Colors.purple,
-    unselectedItemColor: Colors.grey,
-    onTap: (int index)async{
-      currIndex = index;
-      var conn = await databaseConnection();
-      await conn?.connect();
-  try {
-    var result = await conn?.execute('''
-      select * from clubs
-    ''');
-    for (var col in result!.rows) {
-      print(col.assoc()['Name']);
+  buttomNavBar()=> Theme(
+    data: Theme.of(context).copyWith(canvasColor: Colors.purple),
+    child: BottomNavigationBar(
+      backgroundColor: Colors.purple,
+      unselectedItemColor: Colors.grey,
+      onTap: (int index)async{
+        currIndex = index;
+        var conn = await databaseConnection();
+        await conn?.connect();
+    try {
+      var result = await conn?.execute('''
+        select * from clubs
+      ''');
+      for (var col in result!.rows) {
+        print(col.assoc()['Name']);
+      }
+      print(result.cols.toList()[5].name);
+    } catch (e) {
+      print("Error creating coaches table: $e");
+    } finally {
+      await conn?.close();
     }
-    print(result.cols.toList()[5].name);
-  } catch (e) {
-    print("Error creating coaches table: $e");
-  } finally {
-    await conn?.close();
-  }
-
-
-      setState(() {});
-    },
-      currentIndex: currIndex,
-      items: [
-    BottomNavigationBarItem(
-        icon: ImageIcon(AssetImage("assets/coach.jpg")),
-        label: "Coaches",),
-    BottomNavigationBarItem(
-      icon: ImageIcon(AssetImage("assets/coach.jpg")),
-      label: "Players",),
-    BottomNavigationBarItem(
-      icon: ImageIcon(AssetImage("assets/coach.jpg")),
-      label: "Clubs",),
-    ]);
+        setState(() {});
+      },
+        currentIndex: currIndex,
+        items: const[
+      BottomNavigationBarItem(
+          icon: Icon(Icons.manage_accounts),
+          label: "Coaches",),
+      BottomNavigationBarItem(
+        icon:  Icon(Icons.people),
+        label: "Players",),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.sports_soccer),
+        label: "Clubs",),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.stadium),
+            label: "Stadiums",),
+      ]),
+  );
 }
 
 
