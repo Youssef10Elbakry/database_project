@@ -1,4 +1,5 @@
 import 'package:database_proj/coaches_tab.dart';
+import 'package:database_proj/players_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:database_proj/mysql_connection.dart';
 import 'package:mysql1/mysql1.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Widget> tabs = [CoachesTab()];
+  List<Widget> tabs = [CoachesTab(), PlayersTab()];
   int currIndex = 0;
   // This widget is the root of your application.
   @override
@@ -34,7 +35,7 @@ class _MyAppState extends State<MyApp> {
             appBar: AppBar(
               backgroundColor: Colors.purpleAccent,
               centerTitle: true,
-              title: Text("Premier League", style: TextStyle(fontWeight: FontWeight.bold),),
+              title: const Text("Premier League", style: TextStyle(fontWeight: FontWeight.bold),),
             ),
             backgroundColor: Colors.transparent,
         bottomNavigationBar: buttomNavBar(),
@@ -90,22 +91,3 @@ class _MyAppState extends State<MyApp> {
 
 
 
-// databaseConnection();
-//
-// // actually connect to database
-//   data
-//   try {
-//     var result = await conn.execute('''
-//       select * from clubs
-//     ''');
-//     for (var col in result.rows) {
-//       print(col.assoc()['Name']);
-//     }
-//     print(result.cols.toList()[5].name);
-//   } catch (e) {
-//     print("Error creating coaches table: $e");
-//   } finally {
-//     await conn.close();
-//   }
-//
-// }
