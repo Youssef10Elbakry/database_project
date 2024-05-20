@@ -4,28 +4,28 @@ import 'package:flutter/material.dart';
 import 'button.dart';
 import 'mysql_connection.dart';
 
-class ClubsTab extends StatefulWidget {
-  const ClubsTab({super.key});
+class StadiumsTab extends StatefulWidget {
+  const StadiumsTab({super.key});
 
   @override
-  State<ClubsTab> createState() => _ClubsTabState();
+  State<StadiumsTab> createState() => _StadiumTabState();
 }
 
-class _ClubsTabState extends State<ClubsTab> {
-  List attributes= ["ClubID", "Name", "Founded", "Number of Points"];
+class _StadiumTabState extends State<StadiumsTab> {
+  List attributes= ["StadiumID", "Name", "Location", "Capacity"];
   List Ids = [];
   List names = [];
-  List years = [];
-  List points = [];
+  List locations = [];
+  List capacities = [];
   int i = 0;
   List<DataRow> rows = [];
-  List<TextEditingController> clubControllersInsert = [TextEditingController(),
-    TextEditingController(),TextEditingController(), TextEditingController(),];
-  List<TextEditingController> clubControllersUpdate = [TextEditingController(),
+  List<TextEditingController> stadiumControllersInsert = [TextEditingController(),
     TextEditingController(),TextEditingController(), TextEditingController()];
-  List<TextEditingController> clubControllersDelete = [TextEditingController(),
+  List<TextEditingController> stadiumControllersUpdate = [TextEditingController(),
     TextEditingController(),TextEditingController(), TextEditingController()];
-  List<TextEditingController> clubControllersFind = [TextEditingController(),
+  List<TextEditingController> stadiumControllersDelete = [TextEditingController(),
+    TextEditingController(),TextEditingController(), TextEditingController()];
+  List<TextEditingController> stadiumControllersFind = [TextEditingController(),
     TextEditingController(),TextEditingController(), TextEditingController()];
 
   @override
@@ -46,21 +46,21 @@ class _ClubsTabState extends State<ClubsTab> {
                 columns: [
                   DataColumn(label: Text('ID')),
                   DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Founded')),
-                  DataColumn(label: Text('Number of Points')),
+                  DataColumn(label: Text('Location')),
+                  DataColumn(label: Text('Capacity')),
                 ],
                 rows: rows
             ),
           ),
           Row(children: [
             Spacer(),
-            Button(text: "Insert", attributes: attributes,controllers: clubControllersInsert, onClick: distinguisherClubs),
+            Button(text: "Insert", attributes: attributes,controllers: stadiumControllersInsert, onClick: distinguisherStadiums),
             Spacer(),
-            Button(text: "Update", attributes: attributes,controllers: clubControllersUpdate, onClick: distinguisherClubs),
+            Button(text: "Update", attributes: attributes,controllers: stadiumControllersUpdate, onClick: distinguisherStadiums),
             Spacer(),
-            Button(text: "Delete", attributes: attributes,controllers: clubControllersDelete, onClick: distinguisherClubs),
+            Button(text: "Delete", attributes: attributes,controllers: stadiumControllersDelete, onClick: distinguisherStadiums),
             Spacer(),
-            Button(text: "Find", attributes: attributes,controllers: clubControllersFind, onClick: distinguisherClubs),
+            Button(text: "Find", attributes: attributes,controllers: stadiumControllersFind, onClick: distinguisherStadiums),
             Spacer()
           ],)
         ],
@@ -76,13 +76,14 @@ class _ClubsTabState extends State<ClubsTab> {
     try {
       var result = await conn?.execute(query);
       for (var col in result!.rows) {
-        if(column == "ClubID") Ids.add(col.assoc()[column]);
+        if(column == "StadiumID") Ids.add(col.assoc()[column]);
         else if(column == "Name") names.add(col.assoc()[column]);
-        else if(column == "Founded") years.add(col.assoc()[column]);
-        else if(column == "Number_of_points") points.add(col.assoc()[column]);
+        else if(column == "Location") locations.add(col.assoc()[column]);
+        else if(column == "Capacity") capacities.add(col.assoc()[column]);
       }
+      print("finished stadiums");
     } catch (e) {
-      print("Error creating clubs table: $e");
+      print("Error creating stadiums table: $e");
     } finally {
       await conn?.close();
     }
@@ -90,24 +91,24 @@ class _ClubsTabState extends State<ClubsTab> {
 
   void loadDatabase()async{
 
-    await query("SELECT ClubID FROM clubs ORDER BY ClubId ASC", "ClubID");
-    await query("SELECT Name FROM clubs", "Name");
-    await query("SELECT Founded FROM clubs", "Founded");
-    await query("SELECT Number_of_points FROM clubs", "Number_of_points");
+    await query("SELECT StadiumID FROM stadiums ORDER BY StadiumId ASC", "StadiumID");
+    await query("SELECT Name FROM stadiums", "Name");
+    await query("SELECT Location FROM stadiums", "Location");
+    await query("SELECT Capacity FROM stadiums", "Capacity");
     for (int i = 0; i < Ids.length; i++) {
       rows.add(DataRow(
         cells: [
           DataCell(Text(Ids[i])),
           DataCell(Text(names[i])),
-          DataCell(Text(years[i])),
-          DataCell(Text(points[i])),
+          DataCell(Text(locations[i])),
+          DataCell(Text(capacities[i])),
         ],
       ));
     }
     setState(() {});
   }
 
-  void distinguisherClubs(String queryType, List values){
+  void distinguisherStadiums(String queryType, List values){
     if(queryType == "Insert") insertRow(values);
     else if(queryType == "Update") updateRow(values);
     else if(queryType == "Delete") deleteRow(values);
@@ -119,12 +120,12 @@ class _ClubsTabState extends State<ClubsTab> {
     await conn?.connect();
     try {
       var result = await conn?.execute(
-        'INSERT INTO clubs (ClubID, Name, Founded, Number_of_points) VALUES (:id, :name, :founded, :points)',
+        'INSERT INTO stadiums (StadiumID, Name, Location, Capacity) VALUES (:id, :name, :location, :capacity)',
         {
           'id': int.parse(values[0]),
           'name': values[1],
-          'founded': int.parse(values[2]),
-          'points': int.parse(values[3]),
+          'location': values[2],
+          'capacity': values[3],
         },
       );
     }
@@ -143,11 +144,11 @@ class _ClubsTabState extends State<ClubsTab> {
     await conn?.connect();
     try {
       await conn?.execute(
-          '''DELETE FROM clubs WHERE ClubID>0
-      ${values[0].isNotEmpty?" AND ClubID = ${values[0]}":""}
+          '''DELETE FROM stadiums WHERE StadiumID>0
+      ${values[0].isNotEmpty?" AND StadiumID = ${values[0]}":""}
       ${values[1].isNotEmpty?" AND Name = '${values[1]}'":""}
-      ${values[2].isNotEmpty?" AND Founded = '${values[2]}'":""}
-      ${values[3].isNotEmpty?" AND Number_of_points = '${values[3]}'":""}
+      ${values[2].isNotEmpty?" AND Location = '${values[2]}'":""}
+      ${values[3].isNotEmpty?" AND Capacity = '${values[3]}'":""}
       '''
       );
     }
@@ -168,29 +169,28 @@ class _ClubsTabState extends State<ClubsTab> {
     await conn?.connect();
     try {
       var result = await conn?.execute(
-          '''SELECT * FROM clubs WHERE 1=1
-      ${values[0].isNotEmpty?" AND ClubID = ${values[0]}":""}
+          '''SELECT * FROM stadiums WHERE 1=1
+      ${values[0].isNotEmpty?" AND StadiumID = ${values[0]}":""}
       ${values[1].isNotEmpty?" AND Name = '${values[1]}'":""}
-      ${values[2].isNotEmpty?" AND Founded = '${values[2]}'":""}
-      ${values[3].isNotEmpty?" AND Number_of_points = '${values[3]}'":""}
+      ${values[2].isNotEmpty?" AND Location = '${values[2]}'":""}
+      ${values[3].isNotEmpty?" AND Capacity = '${values[3]}'":""}
       '''
       );
-      print(result!.rows.toList()[0].assoc());
       for(var row in result!.rows){
         print(1);
-        Ids.add(row.assoc()["CoachID"]);
+        Ids.add(row.assoc()["StadiumID"]);
         names.add(row.assoc()["Name"]);
-        years.add(row.assoc()["Founded"]);
-        points.add(row.assoc()["Number_of_points"]);
+        locations.add(row.assoc()["Location"]);
+        capacities.add(row.assoc()["Capacity"]);
       }
 
       for (int i = 0; i < Ids.length; i++) {
         rows.add(DataRow(
           cells: [
-            DataCell(Text(Ids[i])),
-            DataCell(Text(names[i])),
-            DataCell(Text(years[i])),
-            DataCell(Text(points[i])),
+            DataCell(Text(Ids[i].toString())),
+            DataCell(Text(names[i].toString())),
+            DataCell(Text(locations[i].toString())),
+            DataCell(Text(capacities[i].toString())),
           ],
         ));
       }
@@ -211,12 +211,12 @@ class _ClubsTabState extends State<ClubsTab> {
     await conn?.connect();
     try {
       await conn?.execute(
-          '''UPDATE clubs SET
-      ${values[0].isNotEmpty?" ClubID = ${values[0]}":""}
+          '''UPDATE stadiums SET
+      ${values[0].isNotEmpty?" StadiumID = ${values[0]}":""}
       ${values[1].isNotEmpty?", Name = '${values[1]}'":""}
-      ${values[2].isNotEmpty?", Founded = '${values[2]}'":""}
-      ${values[3].isNotEmpty?", Number_of_points = '${values[3]}'":""}
-      WHERE ClubID = ${values[0]}
+      ${values[2].isNotEmpty?", Location = '${values[2]}'":""}
+      ${values[3].isNotEmpty?", Capacity = '${values[3]}'":""}
+      WHERE StadiumID = ${values[0]}
       '''
       );
     }
@@ -234,8 +234,8 @@ class _ClubsTabState extends State<ClubsTab> {
   void reset(){
     Ids = [];
     names = [];
-    years = [];
-    points = [];
+    locations = [];
+    capacities = [];
     rows = [];
   }
 }

@@ -1,5 +1,7 @@
+import 'package:database_proj/clubs_tab.dart';
 import 'package:database_proj/coaches_tab.dart';
 import 'package:database_proj/players_tab.dart';
+import 'package:database_proj/stadium_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:database_proj/mysql_connection.dart';
 import 'package:mysql1/mysql1.dart';
@@ -17,7 +19,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Widget> tabs = [CoachesTab(), PlayersTab()];
+  List<Widget> tabs = [const CoachesTab(), const PlayersTab(), const ClubsTab(), const StadiumsTab()];
   int currIndex = 0;
   // This widget is the root of your application.
   @override
@@ -35,7 +37,14 @@ class _MyAppState extends State<MyApp> {
             appBar: AppBar(
               backgroundColor: Colors.purpleAccent,
               centerTitle: true,
-              title: const Text("Premier League", style: TextStyle(fontWeight: FontWeight.bold),),
+              title: Row(
+                children: [
+                  const SizedBox(width: 60,),
+                  Expanded(flex:1, child: Image.asset("assets/pl2.jpeg")),
+                  const SizedBox(width: 15,),
+                  const Expanded(flex: 5,child: Text("Premier League DBMS", style: TextStyle(fontWeight: FontWeight.bold),)),
+                ],
+              ),
             ),
             backgroundColor: Colors.transparent,
         bottomNavigationBar: buttomNavBar(),
@@ -44,7 +53,6 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
   buttomNavBar()=> Theme(
     data: Theme.of(context).copyWith(canvasColor: Colors.purple),
     child: BottomNavigationBar(
